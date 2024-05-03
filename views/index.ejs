@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat app</title>
+  </head>
+  <style>
+    body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+    #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+    #message { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+    #message:focus { outline: none; }
+    #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+    #messages { list-style-type: none; margin: 0; padding: 0; }
+    #messages > li { padding: 0.5rem 1rem; color: var(--user-color); }
+    #messages > li:nth-child(odd) { background: #efefef; }
+  </style>
+  <body>
+    <div><a href="/">Home</a></div>
+    <h1>Chat app</h1>
+    <div id="online-users"></div>
+    <div>Welcome,
+    <%locals.name%>
+    </div>
+    <ul id="messages"></ul>
+    <form id="form" autocomplete="off">
+      <input type="text" id="message" placeholder="Enter message... ">
+      <button id="send">Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const socket = io();
+
+  const form = document.getElementById('form');
+  const input = document.getElementById('message');
+  const messages = document.getElementById('messages');
+  let nickname;
+  let userColor;
+  let otherColor;
+
+  // function setNickname() {
+  //   nickname = prompt("Enter your name: ");
+  //   if (!nickname) {
+  //     setNickname();
+  //   } else {
+  //     socket.emit('nickname', nickname);
+  //   }
+  // }
+
+  // setNickname();
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (input.value && nickname) {
+      const message = input.value;
+      socket.emit('message', { text: message, nickname: nickname, color: userColor }); // Include user's color in the message
+      input.value = '';
+    }
+  });
+
+  socket.on('message', function (msg) {
+    var item = document.createElement('li');
+    var messageText = document.createElement('p');
+    messageText.textContent = `${msg.nickname}: ${msg.text}`;
+    if (msg.nickname === nickname) {
+      messageText.style.color = userColor; // Apply user's color
+    } else {
+      messageText.style.color = otherColor; // Apply other participant's color
+    }
+    item.appendChild(messageText);
+    messages.appendChild(item);
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+
+  socket.on('nickname', function (colors) {
+    userColor = colors.userColor;
+    otherColor = colors.otherColor;
+    document.documentElement.style.setProperty('--user-color', userColor); // Set custom CSS variable for user color
+    updateOnlineUsers();
+  });
+  
+  // socket.on('user_connected', function (nickname){
+  //   const onlineUsers = document.getElementById('online-users');
+  //   onlineUsers.innerHTML += `<p style="color: green">${nickname} is online. </p>`;
+  // })
+  socket.on('user_disconnected', function(nickname){
+    const onlineUsers = document.getElementById('online-users');
+    onlineUsers.innerHTML += `<p style="color: red">${nickname} is offline. </p>`;
+  })
+
+  socket.on('online_users', function (onlineUsers) {
+        // Update online users list when receiving the list from the server
+        const onlineUsersDiv = document.getElementById('online-users');
+        onlineUsersDiv.innerHTML = '<h2>Online Users</h2>';
+        onlineUsers.forEach(nickname => {
+            onlineUsersDiv.innerHTML += `<p style="color: green" data-nickname="${nickname}">${nickname} is online</p>`;
+        });
+    });
+
+    // Function to update online users
+    function updateOnlineUsers() {
+        // Request updated list of online users from the server
+        socket.emit('get_online_users');
+    }
+    
+    input.addEventListener('focusin', (e)=>{
+      const typingIndicator = document.createElement('span');
+      socket.emit('typing');
+      socket.on('typing', (data)=>{
+        if(input.value.trim()===''){
+        socket.emit('typing', {text: ''});
+      typingIndicator.remove();
+      }
+      if(e.key === "Enter"){
+        typingIndicator.remove();
+        socket.emit('typing', {text: ''});
+      }
+        if(data.text !== ''){
+          typingIndicator.textContent = data.text;
+          document.body.append(typingIndicator);
+        }
+        else
+        typingIndicator.textContent = '';
+      })
+      
+    });
+  });
+
+
+
+
+
+  
+    </script>
+  </body>
+</html>
