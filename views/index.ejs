@@ -12,18 +12,58 @@
     #message { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
     #message:focus { outline: none; }
     #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
     #messages { list-style-type: none; margin: 0; padding: 0; }
     #messages > li { padding: 0.5rem 1rem; color: var(--user-color); }
     #messages > li:nth-child(odd) { background: #efefef; }
+    #typing  {position: fixed; bottom: 3.5rem; left: 1rem; color: #666;}
+    nav {
+            background-color: rgb(135, 235, 168);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+        }
+
+        nav h1 {
+            margin: 0;
+            color: blue;
+            font-size: 2rem;
+
+        }
+
+         ul {
+            list-style-type: none;
+        }
+
+        li {
+            margin-left: 1rem;
+        }
+
+        li:first-child {
+            margin-left: 0;
+        }
+
+        li>a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        li>a:hover {
+            color: blue;
+        }
+
   </style>
   <body>
-    <div><a href="/">Home</a></div>
-    <h1>Chat app</h1>
+<nav>
+      <h1>Chat- Global Mode</h1>
+      <ul>
+        <li><a href="/">Sign out</a></li>
+      </ul>
+    </nav>
     <div id="online-users"></div>
-    <div>Welcome,
-    <%locals.name%>
-    </div>
+    <div id="typing"></div>
     <ul id="messages"></ul>
     <form id="form" autocomplete="off">
       <input type="text" id="message" placeholder="Enter message... ">
@@ -33,107 +73,53 @@
     <script>
 document.addEventListener('DOMContentLoaded', () => {
   const socket = io();
-
   const form = document.getElementById('form');
   const input = document.getElementById('message');
   const messages = document.getElementById('messages');
-  let nickname;
+  const typing = document.getElementById('typing');
+  let typingTimer;
+  const nickname = '<%= locals.name %>';
   let userColor;
   let otherColor;
-
-  // function setNickname() {
-  //   nickname = prompt("Enter your name: ");
-  //   if (!nickname) {
-  //     setNickname();
-  //   } else {
-  //     socket.emit('nickname', nickname);
-  //   }
-  // }
-
-  // setNickname();
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (input.value && nickname) {
       const message = input.value;
-      socket.emit('message', { text: message, nickname: nickname, color: userColor }); // Include user's color in the message
+      socket.emit('message', { text: message, nickname: nickname}); // Include user's color in the message
       input.value = '';
     }
   });
+  //typing
+  input.addEventListener('input', function(){
+    clearTimeout(typingTimer);
+    socket.emit('typing');
+    typingTimer = setTimeout(function(){
+      socket.emit('stop typing');
+    }, 1000);
+  })
+
+  socket.on('user typing', function(user){
+    typing.textContent = user + ' is typing...';
+  })
+  socket.on('user stopped typing', function(){
+    typing.textContent = '';
+  })
 
   socket.on('message', function (msg) {
     var item = document.createElement('li');
     var messageText = document.createElement('p');
     messageText.textContent = `${msg.nickname}: ${msg.text}`;
-    if (msg.nickname === nickname) {
-      messageText.style.color = userColor; // Apply user's color
-    } else {
-      messageText.style.color = otherColor; // Apply other participant's color
-    }
-    item.appendChild(messageText);
+    messageText.style.color = msg.color; 
+    item.appendChild(messageText);  
     messages.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
   });
-
-  socket.on('nickname', function (colors) {
-    userColor = colors.userColor;
-    otherColor = colors.otherColor;
-    document.documentElement.style.setProperty('--user-color', userColor); // Set custom CSS variable for user color
-    updateOnlineUsers();
+  // User connected
+  socket.emit("new_user", nickname);
   });
-  
-  // socket.on('user_connected', function (nickname){
-  //   const onlineUsers = document.getElementById('online-users');
-  //   onlineUsers.innerHTML += `<p style="color: green">${nickname} is online. </p>`;
-  // })
-  socket.on('user_disconnected', function(nickname){
-    const onlineUsers = document.getElementById('online-users');
-    onlineUsers.innerHTML += `<p style="color: red">${nickname} is offline. </p>`;
-  })
-
-  socket.on('online_users', function (onlineUsers) {
-        // Update online users list when receiving the list from the server
-        const onlineUsersDiv = document.getElementById('online-users');
-        onlineUsersDiv.innerHTML = '<h2>Online Users</h2>';
-        onlineUsers.forEach(nickname => {
-            onlineUsersDiv.innerHTML += `<p style="color: green" data-nickname="${nickname}">${nickname} is online</p>`;
-        });
-    });
-
-    // Function to update online users
-    function updateOnlineUsers() {
-        // Request updated list of online users from the server
-        socket.emit('get_online_users');
-    }
-    
-    input.addEventListener('focusin', (e)=>{
-      const typingIndicator = document.createElement('span');
-      socket.emit('typing');
-      socket.on('typing', (data)=>{
-        if(input.value.trim()===''){
-        socket.emit('typing', {text: ''});
-      typingIndicator.remove();
-      }
-      if(e.key === "Enter"){
-        typingIndicator.remove();
-        socket.emit('typing', {text: ''});
-      }
-        if(data.text !== ''){
-          typingIndicator.textContent = data.text;
-          document.body.append(typingIndicator);
-        }
-        else
-        typingIndicator.textContent = '';
-      })
-      
-    });
-  });
-
-
-
-
-
-  
+  //User disconnected
+  socket.emit("disconnect", nickname);
     </script>
   </body>
 </html>
