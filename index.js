@@ -57,9 +57,12 @@ const { Server } = require("socket.io");
 const { name } = require("ejs");
 const io = new Server(server);
 const users = {};
+const userColor = "rgb(135, 235, 168)";
 //handling socket.io
 io.on("connection", (socket) => {
   //socket is the client that is connected to the server
+  
+  // console.log("A user connected", socket.id);
   
   //typing
   socket.on('typing', ()=>{
@@ -70,31 +73,22 @@ io.on("connection", (socket) => {
   })
 
   //nickname handling
-  socket.on("new_user", (nickname) => {
-    users[socket.id] = { nickname };
-    io.emit("message", {
-      text: `${nickname} has joined the chat`,
-      color: "green",
-    });
-    io.emit("user_connected", nickname);
+  socket.on("new_user", ({nickname, color}) => {
+    io.emit("user_joined", {nickname});
   });
 
   socket.on("message", (message) => {
-    // 'message' is derived from the client side emit event
+    // 'message' is derived from the client  side emit event
     // console.log("A new message: ", message);
     const { text, nickname} = message;
-    const userColor = randomColor();
     io.emit("message", { text, nickname, userColor});
   });
 
   //diconnect
   socket.on("disconnect", () => {
-    if (users[socket.id]) {
-      io.emit("message", {
-        text: `${users[socket.id].nickname} has left the chat`,
-        color: "red",
-      });
-      io.emit("user_disconnected", users[socket.id].nickname);
+    if(users[socket.id]){
+      const {nickname} = users[socket.id];
+      io.emit("user_left", { nickname:nickname});
       delete users[socket.id];
     }
   });

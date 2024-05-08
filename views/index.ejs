@@ -8,56 +8,125 @@
   <style>
     body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-    #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-    #message { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-    #message:focus { outline: none; }
-    #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-    #messages { list-style-type: none; margin: 0; padding: 0; }
-    #messages > li { padding: 0.5rem 1rem; color: var(--user-color); }
-    #messages > li:nth-child(odd) { background: #efefef; }
-    #typing  {position: fixed; bottom: 3.5rem; left: 1rem; color: #666;}
-    nav {
-            background-color: rgb(135, 235, 168);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 2rem;
-        }
+    #form {
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.25rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    height: 3rem;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+  }
 
-        nav h1 {
-            margin: 0;
-            color: blue;
-            font-size: 2rem;
+  #message {
+    border: none;
+    position: relative;
+    padding: 0 1rem;
+    flex-grow: 1;
+    border-radius: 2rem;
+    margin: 0.25rem;
+  }
 
-        }
+  #message:focus {
+    outline: none;
+  }
 
-         ul {
-            list-style-type: none;
-        }
+  #form > button {
+    background: #333;
+    border: none;
+    padding: 0 1rem;
+    margin: 0.25rem;
+    border-radius: 3px;
+    outline: none;
+    color: #fff;
+  }
 
-        li {
-            margin-left: 1rem;
-        }
+  /* Chat message display */
+  #messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
 
-        li:first-child {
-            margin-left: 0;
-        }
+  #messages > li {
+  display: block; /* Display messages as block elements */
+  background-color: blue;
+  border-radius: 55px;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+  max-width: 65%;
+  border-radius: 10px 55px 55px 55px;
+  width: fit-content; /* Set width based on content */
+  word-wrap: break-word; /* Allow long words to break */
+}
 
-        li>a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
+span.user-join-message {
+  position: fixed;
+  bottom: 4rem; /* Adjust as needed */  
+  right: 1rem;
+  width: 10%; /* Adjust width as needed */
+  color: rgb(145, 185, 168);
+  font-weight: bold;
+  background-color: yellow;
+  padding: 5px;
+}
 
-        li>a:hover {
-            color: blue;
-        }
+
+
+
+  /* Typing indicator */
+  #typing {
+    position: fixed;
+    bottom: 3.5rem;
+    left: 1rem;
+    color: #666;
+  }
+
+  /* Navigation bar */
+  nav {
+    background-color: rgb(135, 235, 168);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+  }
+
+  nav h1 {
+    margin: 0;
+    color: blue;
+    font-size: 2rem;
+  }
+
+  ul {
+    list-style-type: none;
+  }
+
+  li {
+    margin-left: 1rem;
+  }
+
+  li:first-child {
+    margin-left: 0;
+  }
+
+  li > a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+
+  li > a:hover {
+    color: blue;
+  }
 
   </style>
   <body>
 <nav>
-      <h1>Chat- Global Mode</h1>
+      <h1>Chat<code style="font-size: 14px; color: #666;">< Global Mode/></code></h1>
       <ul>
         <li><a href="/">Sign out</a></li>
       </ul>
@@ -82,11 +151,13 @@ document.addEventListener('DOMContentLoaded', () => {
   let userColor;
   let otherColor;
 
+
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (input.value && nickname) {
       const message = input.value;
-      socket.emit('message', { text: message, nickname: nickname}); // Include user's color in the message
+      socket.emit('message', { text: message, nickname: nickname, color: userColor}); // Include user's color in the message
       input.value = '';
     }
   });
@@ -110,16 +181,32 @@ document.addEventListener('DOMContentLoaded', () => {
     var item = document.createElement('li');
     var messageText = document.createElement('p');
     messageText.textContent = `${msg.nickname}: ${msg.text}`;
-    messageText.style.color = msg.color; 
+    messageText.style.color = msg.userColor; 
+    messageText.style.position = 'relative';
+    messageText.style.top = '10px';
     item.appendChild(messageText);  
     messages.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
   });
   // User connected
-  socket.emit("new_user", nickname);
-  });
+  socket.emit('new_user', {nickname: nickname, color: "rgb(135, 235, 168)"});
+  socket.on("user_joined", (data)=>{
+    var item = document.createElement('span');
+    item.textContent = `${data.nickname} has joined the chat!`;
+    item.classList.add('user-join-message');  
+    document.body.appendChild(item);
+  })
   //User disconnected
-  socket.emit("disconnect", nickname);
+  socket.on('disconnect', (data)=>{
+    socket.emit("user_left", {nickname: nickname});
+    var item = document.createElement('span');
+    item.textContent = `${nickname} has left the chat!`;
+    item.classList.add('user-join-message');
+    item.style.color = 'red';
+    document.body.appendChild(item);
+  });
+  
+  });
     </script>
   </body>
 </html>
