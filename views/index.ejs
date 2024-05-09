@@ -49,6 +49,8 @@
     list-style-type: none;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   #messages > li {
@@ -123,11 +125,38 @@ span.user-join-message {
     color: blue;
   }
 
+  .user-message {
+    text-align: left;
+    background-color: #DCF8C6!important; /* Light green background for user messages */
+    border-radius: 20px;
+    padding: 10px 15px;
+    margin-right: 50%; 
+  }
+
+  /* Other users' messages */
+  .other-message {
+    text-align: right;
+    background-color: blue !important; /* Light gray background for other users' messages */
+    border-radius: 20px;
+    color: white;
+    padding: 10px 15px;
+    margin-left: 50%;
+    align-self: flex-end;
+  }
+  .dark{
+  background-color: rgba(0, 0, 0, 0.922);
+        }
+  #dark{
+    position: absolute;
+    right: 10%;
+  }
   </style>
   <body>
-<nav>
-      <h1>Chat<code style="font-size: 14px; color: #666;">< Global Mode/></code></h1>
+    <nav>
+      <h1>Chat<code style="font-size: 14px; color: #666;">< Global Mode
+          /></code></h1>
       <ul>
+        <li id="dark" style="cursor: pointer;"><i class="fas fa-moon"></i></li>
         <li><a href="/">Sign out</a></li>
       </ul>
     </nav>
@@ -139,6 +168,8 @@ span.user-join-message {
       <button id="send">Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
     <script>
 document.addEventListener('DOMContentLoaded', () => {
   const socket = io();
@@ -151,6 +182,19 @@ document.addEventListener('DOMContentLoaded', () => {
   let userColor;
   let otherColor;
 
+  const darkBtn = document.getElementById('dark');
+        darkBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            section.forEach((element) => {
+                element.classList.toggle('dark');
+            });
+            if (document.body.classList.contains('dark')) {
+                darkBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                darkBtn.style.color = 'yellow';
+            } else {
+                darkBtn.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
 
 
   form.addEventListener('submit', function (e) {
@@ -179,15 +223,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('message', function (msg) {
     var item = document.createElement('li');
-    var messageText = document.createElement('p');
-    messageText.textContent = `${msg.nickname}: ${msg.text}`;
-    messageText.style.color = msg.userColor; 
-    messageText.style.position = 'relative';
-    messageText.style.top = '10px';
-    item.appendChild(messageText);  
+
+    if (msg.nickname === nickname) {
+      item.classList.add('user-message');
+      item.textContent = msg.text;
+    } else {
+      var userName = document.createElement('h5');
+      item.style.borderRadius = '55px 10px 55px 55px';
+      userName.textContent = msg.nickname;
+      item.appendChild(userName);
+      var messageText = document.createElement('p');
+      messageText.textContent = msg.text;
+      item.appendChild(messageText);  
+      item.classList.add('other-message');
+    }
+
+
     messages.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
   });
+
   // User connected
   socket.emit('new_user', {nickname: nickname, color: "rgb(135, 235, 168)"});
   socket.on("user_joined", (data)=>{
