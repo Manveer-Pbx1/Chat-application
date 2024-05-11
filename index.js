@@ -63,6 +63,7 @@ io.on("connection", (socket) => {
   //socket is the client that is connected to the server
   
   // console.log("A user connected", socket.id);
+  users[socket.id] = socket;
   
   //typing
   socket.on('typing', ()=>{
@@ -71,6 +72,9 @@ io.on("connection", (socket) => {
   socket.on('stop typing', ()=>{
     socket.broadcast.emit('user stopped typing');
   })
+  //no of online users:
+    io.emit('online_users', Object.keys(users).length);
+  
 
   //nickname handling
   socket.on("new_user", ({nickname, color}) => {
@@ -87,9 +91,9 @@ io.on("connection", (socket) => {
   //diconnect
   socket.on("disconnect", () => {
     if(users[socket.id]){
-      const {nickname} = users[socket.id];
-      io.emit("user_left", { nickname:nickname});
+      io.emit("user_left", { nickname: users[socket.id].nickname});
       delete users[socket.id];
+      io.emit('online_users', Object.keys(users).length);
     }
   });
 });

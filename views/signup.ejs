@@ -41,6 +41,11 @@
         input,button{
             box-shadow: 1px 1px 1px  black;
         }
+        .error {
+            color: red;
+            font-size: 0.8em;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -49,10 +54,21 @@
     <!-- <img id="sign" src="https://images.pexels.com/photos/3822201/pexels-photo-3822201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" > -->
     <form action="/signup" method="post" autocomplete="off">
         <input type="text" name="name" placeholder="Enter username" required autocomplete="off">
-        <input type="email" name="email" placeholder="chatter@example.com" required>
+        <input type="email" name="email" placeholder="chatter@example.com" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+        <p class="error">Enter a valid email address!</p>
         <input type="password" name="password" placeholder="Enter password" required>
         <button type="submit">Sign up</button>
         <span>Already a user? <a href="/signin"> Sign in</a></span>
     </form>
+    <script>
+        const emailInput = document.querySelector('input[type="email"]');
+        const error = document.querySelector('.error');
+        emailInput.addEventListener('input', ()=>{
+            if(emailInput.validity.valid)
+            error.style.display = 'none';
+        else
+            error.style.display = 'block';
+        })
+    </script>
 </body>
 </html>

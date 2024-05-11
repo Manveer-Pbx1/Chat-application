@@ -190,9 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (document.body.classList.contains('dark')) {
                 darkBtn.innerHTML = '<i class="fas fa-sun"></i>';
-                darkBtn.style.color = 'yellow';
+                darkBtn.style.color = 'golden';
             } else {
                 darkBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                darkBtn.style.color = 'white';
             }
         });
 
@@ -252,14 +253,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(item);
   })
   //User disconnected
-  socket.on('disconnect', (data)=>{
-    socket.emit("user_left", {nickname: nickname});
-    var item = document.createElement('span');
-    item.textContent = `${nickname} has left the chat!`;
-    item.classList.add('user-join-message');
-    item.style.color = 'red';
-    document.body.appendChild(item);
+  window.addEventListener('beforeunload', ()=>{
+    socket.emit('disconnect');
+  })
+  socket.on('user_left', (data) => {
+  var item = document.createElement('span');
+  item.textContent = `${data.nickname} has left the chat!`;
+  item.classList.add('user-join-message');
+  item.style.color = 'red';
+  document.body.appendChild(item);
+});
+
+  //number of online users:
+  socket.on('online_users', (data)=>{
+    console.log(data);
+    document.getElementById('online-users').textContent = `Online users: ${data}`;
   });
+
   
   });
     </script>
