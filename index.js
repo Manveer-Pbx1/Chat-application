@@ -16,13 +16,10 @@ connectToMongoDB("mongodb://127.0.0.1:27017/chat").then(()=>{
 app.get("/signup", (req,res) => {
   return res.render("signup");
 })
-app.get("/signin", (req,res) => {
-  return res.render("signin");
-})
 
 
 app.get("/", (req, res) => {
-  return res.render("home");
+  return res.render("signin");
 });
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -36,19 +33,29 @@ app.post("/signup", async(req,res)=>{
   return res.redirect("/signin");
 });
 
+app.get("/signin", (req,res)=>{
+  return res.render("signin");
+})
+
+
 app.post("/signin", async(req,res)=>{
   const { email, password } = req.body;
   const user = await User.findOne({email, password});
-  
   if (!user ) {
     return res.status(401).json({message: "Invalid credentials"});
   }
-  return res.redirect(`/index?name=${user.name}`);
+  return res.redirect(`/home?name=${user.name}`);
 })
 
-app.get("/index", (req,res)=>{
+
+app.get("/home", (req,res)=>{
+  const {name} = req.query;
+  return res.render("home", {name});
+})
+
+app.get("/global", async(req,res)=>{
   const {name}= req.query;
-  return res.render("index", {name});
+  return res.render('index', {name});
 })
 
 //SOCKET CODE STARTS HERE

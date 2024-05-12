@@ -81,17 +81,26 @@
             background-color: rgba(0, 0, 0, 0.811);
             color: #f9f9f9;
         }
+        code{
+            font-size: 14px; 
+            color: #666;
+            width: auto;
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
     <nav>
-        <h1>Chat</h1>
+        <h1>Chat </h1>
         <ul>
+            <li><a href="/global?name=<%=locals.name%>"><code >< Global Mode /></code></a></li>
+            <li><a href="/private?name=<%=locals.name%>"><code >< Private Mode /></code></a></li>
             <li id="dark" style="cursor: pointer;"><i class="fas fa-moon"></i></li>
             <li><a href="/signup">Sign up</a></li>
             <li><a href="/signin">Sign in</a></li>
         </ul>
     </nav>
+
     <section class="section">
         <h2>What is <span class="highlight">Chat</span>? <i class="fas fa-comments "></i> </h2>
         <p><span class="highlight">Chat</span> is a professional web application that enables real-time communication using web sockets. Our platform allows users to seamlessly sign up, sign in, and connect with others in a secure and efficient manner.</p>
