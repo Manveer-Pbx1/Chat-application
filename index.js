@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const PORT = process.env.PORT || 8000;
 const {connectToMongoDB} = require("./connect");
 const path = require("path"); // we need path to join paths to our HTML files.
 const http = require("http"); // we want http for web sockets
@@ -10,7 +11,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.resolve('./views'));
 const User = require("./models/user.model");
 //connect to mongodb
-connectToMongoDB("mongodb://127.0.0.1:27017/chat").then(()=>{
+connectToMongoDB(process.env.MONGO_URL).then(()=>{
   console.log("Connected to mongodb");
 })
 
@@ -138,6 +139,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-server.listen(8000, () => console.log("Server started on port 8000"));
+server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 //ASSIGNMENT:
 //Go to socket.io/get-started/chat and follow the instructions to create a chat application using socket.io
