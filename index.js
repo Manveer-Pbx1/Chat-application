@@ -5,6 +5,7 @@ const path = require("path"); // we need path to join paths to our HTML files.
 const http = require("http"); // we want http for web sockets
 const server = http.createServer(app); // we create a server using the express app as base
 const randomColor = require('randomcolor');
+const rooms = {};
 app.set('view engine', 'ejs');
 app.set('views', path.resolve('./views'));
 const User = require("./models/user.model");
@@ -58,12 +59,45 @@ app.get("/global", async(req,res)=>{
   return res.render('index', {name});
 })
 
+app.get("/private", async(req,res)=>{
+  const {name}= req.query;
+  return res.render('private_home', {name});
+})
+
+
+app.post("/create-private-room", (req,res)=>{
+  const room = req.body.create_room;
+  
+  rooms[room] = true;
+  res.redirect(`/private/${room}`)
+  
+})
+app.post("/join-private-room", (req,res)=>{
+  const room = req.query.join_room;
+  if(rooms[room]){
+    return res.render("private", {roomId: room, name: req.query.name});
+  }
+  else{
+  res.sendStatus("404");
+  }
+})
+app.get("/private/:roomId", (req,res)=>{
+  const {roomId} = req.params;
+  const {name} = req.query;
+    if(rooms[roomId]){
+    return res.render("private", {roomId,name});
+    }
+    else
+    return res.sendStatus("404");
+})
+
 //SOCKET CODE STARTS HERE
 //socket io imports
 const { Server } = require("socket.io");
 const { name } = require("ejs");
 const io = new Server(server);
 const users = {};
+
 const userColor = "rgb(135, 235, 168)";
 //handling socket.io
 io.on("connection", (socket) => {
