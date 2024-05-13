@@ -1,0 +1,109 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <!-- Room ID card design -->
+    <div class="container">
+        <h2>Private Room</h2>
+        <form id="createForm" action="/create-private-room" method="POST">
+            <label for="create_room">Create a room</label>
+            <input name="create_room" type="number" id="create_room" placeholder="Enter room ID">
+            <button type="submit" id="create">Create</button>
+        </form>
+        <hr>
+        <h3>OR</h3>
+        <form id="joinForm" action="/join-private-room" method="POST">
+            <label for="join_room">Join a room</label>
+            <input name="join_room" type="number" id="join_room" placeholder="Enter room ID">
+            <button type="submit" id="join">Join</button>
+        </form>
+    </div>
+    <script>
+
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const room = document.getElementById('create_room').value;
+    const response = await fetch('/create-private-room', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ create_room: room })
+    });
+    const result = await response.json();
+    if (result.error) {
+        alert(result.error);
+    } else {
+        window.location.href = `/private/${room}`;
+    }
+});
+
+document.getElementById('joinForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const room = document.getElementById('join_room').value;
+    const response = await fetch('/join-private-room', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ join_room: room })
+    });
+    const result = await response.json();
+    if (result.error) {
+        alert(result.error);
+    } else {
+        window.location.href = `/private/${room}`;
+    }
+});
+
+
+    </script>
+</body>
+</html>
