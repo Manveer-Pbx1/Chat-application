@@ -10,6 +10,7 @@ const rooms = {};
 
 require('dotenv').config();
 app.set('view engine', 'ejs');
+app.set('views', path.resolve('./views'));
 const User = require("./userModel");
 //connect to mongodb
 connectToMongoDB(process.env.MONGO_URL).then(()=>{
