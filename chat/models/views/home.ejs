@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Chat</title>
+    <style>
+        body {
+            margin: 0;
+            padding-bottom: 3rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        nav {
+            background-color: rgb(135, 235, 168);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+        }
+
+        nav h1 {
+            margin: 0;
+            color: blue;
+            font-size: 2rem;
+
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        li {
+            margin-left: 1rem;
+        }
+
+        li:first-child {
+            margin-left: 0;
+        }
+
+        li>a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        li>a:hover {
+            color: blue;
+        }
+
+        section {
+            padding: 2rem;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ccc;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 48px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .highlight {
+            color: blue;
+            font-weight: bold;
+        }
+        .green{
+            color: green;
+        }
+        .dark{
+            background-color: rgba(0, 0, 0, 0.811);
+            color: #f9f9f9;
+        }
+        code{
+            font-size: 14px; 
+            color: #666;
+            width: auto;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Chat </h1>
+        <ul>
+            <li><a href="/global?name=<%=locals.name%>"><code >< Global Mode /></code></a></li>
+            <li><a href="/private?name=<%=locals.name%>"><code >< Private Mode />(<span style="background-color: red; color: yellow;">Under Development!</span>)</code></a></li>
+            <li id="dark" style="cursor: pointer;"><i class="fas fa-moon"></i></li>
+            <li><a href="/signup">Sign up</a></li>
+            <li><a href="/signin">Sign in</a></li>
+        </ul>
+    </nav>
+
+    <section class="section">
+        <h2>What is <span class="highlight">Chat</span>? <i class="fas fa-comments "></i> </h2>
+        <p><span class="highlight">Chat</span> is a professional web application that enables real-time communication using web sockets. Our platform allows users to seamlessly sign up, sign in, and connect with others in a secure and efficient manner.</p>
+    </section>
+    <section class="section">
+        <h2>How does <span class="highlight">Chat</span> work? <i class="fas fa-cogs"></i></h2>
+        <p><span class="highlight">Chat</span> uses web sockets to establish a connection between the client and server. When a user sends a message, the server broadcasts it to all connected clients. This allows for real-time communication between users.</p>
+        <div style="width:100%;height:50%;padding-bottom:50%;position:relative;"><iframe src="https://giphy.com/embed/5Dmnt6gL6GnbGwgxiJ" width="100%" height="100%" style="position:absolute" frameBorder="0" allowFullScreen></iframe></div>
+    </section>
+    <section class="section">
+        <h2>Types of Messaging in <span class="highlight">Chat</span></h2>
+        <div>
+            <h3>Global Messaging</h3>
+            <p>Global messaging allows you to send messages that are visible to all users of the platform.</p>
+        </div>
+        <div>
+            <h3>Private Messaging</h3>
+            <p>Private messaging enables you to have one-on-one conversations with specific users privately.</p>
+        </div>
+        <div>
+            <h3>Group Messaging</h3>
+            <p>Group messaging lets you create or join groups to chat with multiple users at once in a shared conversation.</p>
+        </div>
+    </section>
+    <section class="section">
+        <h2>Why use <span class="highlight">Chat</span>? <i class="fas fa-check green"></i></h2>
+        <p><span class="highlight">Chat</span> is a reliable and efficient platform for real-time communication. Whether you're looking to connect with friends, family, or colleagues, <span class="highlight">Chat</span> has you covered. Sign up today and start chatting!</p>
+        <p><span class="highlight">Chat</span> - Connecting people, one message at a time.</p>
+    </section>
+    <footer style="text-align: center;">
+        <p>&copy; 2024 <span class="highlight">Chat</span>. All rights reserved.</p>
+    </footer>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script>
+        const socket = io();
+        const section = document.querySelectorAll('section');
+        const darkBtn = document.getElementById('dark');
+        darkBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            section.forEach((element) => {
+                element.classList.toggle('dark');
+            });
+            if (document.body.classList.contains('dark')) {
+                darkBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                darkBtn.style.color = 'yellow';
+            } else {
+                darkBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                darkBtn.style.color = 'black';
+            }
+        });
+    </script>
+</body>
+</html>

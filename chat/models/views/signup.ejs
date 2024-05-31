@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up</title>
+    <style>
+        body {margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        h1 { margin: 0; padding: 1rem; color: #fff; background-color: rgb(135, 235, 168); color: blue;}
+        form {padding: 6rem; height: 350px; width: 50%; border-radius: 5px; display: flex; flex-direction: column; }
+        input { margin: 0.25rem; cursor: pointer; padding: 0.5rem; border: 1px solid #ccc; border-radius: 3px; width: 75%; height: 48px; box-sizing: border-box; }
+        button { margin: 0.25rem; padding: 0.5rem; border: none; border-radius: 3px; background: yellow; color: blue; font-weight: bold; cursor: pointer; width: 15%; }
+        button:hover { opacity: 0.7;}
+        a { color: blue;}
+        img{
+            position: absolute;
+            float: right;
+            right: 5%;
+            border-radius: 15%;
+        }
+        #sign{
+            z-index: -1;
+            /* filter: blur(2px); */
+            left: 2%;
+            width: 55%;
+            height: 75%;
+            padding: 1%;
+        }
+        form>span{
+            font-size: .9em;
+            float: right;
+            position: relative;
+            left: 65%;
+            line-height: normal;
+            background-color: yellow;
+            width: 25%;
+            font-weight: bold;
+            color: blue;
+            text-shadow: 1px 1px 1px yellow;
+        }
+        input,button{
+            box-shadow: 1px 1px 1px  black;
+        }
+        .error {
+            color: red;
+            font-size: 0.8em;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign up</h1>
+    <img src="https://www.transparentpng.com/thumb/goggles/new-stylish-navy-blue-sunglasses-hd-png-4GnoKz.png"></img>
+    <!-- <img id="sign" src="https://images.pexels.com/photos/3822201/pexels-photo-3822201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" > -->
+    <form action="/signup" method="post" autocomplete="off">
+        <input type="text" name="name" placeholder="Enter username" required autocomplete="off">
+        <input type="email" name="email" placeholder="chatter@example.com" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+        <p class="error">Enter a valid email address!</p>
+        <input type="password" name="password" placeholder="Enter password" required>
+        <button type="submit">Sign up</button>
+        <span>Already a user? <a href="/signin"> Sign in</a></span>
+    </form>
+    <script>
+        const emailInput = document.querySelector('input[type="email"]');
+        const error = document.querySelector('.error');
+        emailInput.addEventListener('input', ()=>{
+            if(emailInput.validity.valid)
+            error.style.display = 'none';
+        else
+            error.style.display = 'block';
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in</title>
+    <style>
+            body {margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        h1 { margin: 0; padding: 1rem; color: #fff; background-color: rgb(135, 235, 168); color: blue;}
+        form {padding: 6rem; height: 350px; width: 50%; border-radius: 5px; display: flex; flex-direction: column; }
+        input { margin: 0.25rem; cursor: pointer; padding: 0.5rem; border: 1px solid #ccc; border-radius: 3px; width: 75%; height: 48px; box-sizing: border-box; }
+        button { margin: 0.25rem; padding: 0.5rem; border: none; border-radius: 3px; background: blue; color: yellow; font-weight: bold; cursor: pointer; width: 15%; }
+        button:hover { opacity: 0.83; }
+        a { color: yellow;}
+        img{
+            position: absolute;
+            float: right;
+            right: 5%;
+            border-radius: 15%;
+        }
+        #sign{
+            z-index: -1;
+            /* filter: blur(2px); */
+            left: 2%;
+            width: 55%;
+            height: 75%;
+            padding: 1%;
+        }
+        form>span{
+            font-size: .9em;
+            float: right;
+            position: relative;
+            left: 65%;
+            line-height: normal;
+            background-color: blue;
+            width: 25%;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 1px black;
+        }
+        input,button{
+            box-shadow: 1px 1px 1px  black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign in</h1>
+    <img src="https://www.transparentpng.com/thumb/mustache/asMyMY-mustache-png-icon.png" alt="mustache png icon @transparentpng.com">
+    <!-- <img id="sign" src="https://images.pexels.com/photos/394377/pexels-photo-394377.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="sign in image"> -->
+    <form action="/signin" method="post" autocomplete="off">
+        <input type="email" name="email" placeholder="Enter email" required autocomplete="off">
+        <input type="password" name="password" placeholder="Enter password" required>
+        <button type="submit">Sign in</button>
+        <span>New to chat? <a href="/signup">Sign up</a> </span>
+    </form>
+</body>
+</html>
